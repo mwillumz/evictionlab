@@ -1,7 +1,7 @@
 ---
 title: "Eviction Lab Data"
 runtime: shiny_prerendered
-output: tint::tintHtml
+output: radix::radix_article
 ---
 
 ```{r setup, context = "setup", include=FALSE}
@@ -18,15 +18,15 @@ options(tigris_class = "sf")
 
 ## Eviction Lab Methodology
 
-```{marginfigure, echo = TRUE}
+As the map on the right illustrates the Eviction Lab data are not yet comprehensive. The following code is used to restrict the data to only the states that are mostly complete. Code that is used to carry out an analysis can easily be included in the final output if desired. 
 
 ![](www/nytimesmap.png)
 
+<aside>
+
 You can insert images into an R Markdown document that have been generated elsewhere. The map above is from a [New York Times article](https://www.nytimes.com/interactive/2018/04/07/upshot/millions-of-eviction-records-a-sweeping-new-look-at-housing-in-america.html) from earlier this year. The map illustrates which parts of the United States have fairly good coverage in the Eviction Lab data.
 
-```
-
-As the map on the right illustrates the Eviction Lab data are not yet comprehensive. The following code is used to restrict the data to only the states that are mostly complete. Code that is used to carry out an analysis can easily be included in the final output if desired. 
+</aside>
 
 ```{r states, contex = "data", cache = TRUE, echo = TRUE}
 States <- tidycensus::fips_codes %>%
@@ -79,7 +79,7 @@ BlockGroups <- do.call(rbind, BlockGroups)
 
 The data is not comprehensive. The unadjusted filing rate is shown in the chart below for all  data available.
 
-```{r, fig.margin = TRUE}
+```{r trend}
 
 Plot <- group_by(Data, year) %>%
   summarise(`eviction-filing rate` = sum(`eviction-filings`, na.rm = TRUE) / sum(`renter-occupied-households`, na.rm = TRUE))
@@ -88,6 +88,13 @@ P <- ggplot() +
   geom_line(aes(x = year, y = `eviction-filing rate`), data = Plot) +
   labs(title = "Eviction filing rate by year",
        caption = "Source: Eviction Lab")
+
+P
+```
+
+<aside>
+
+```{r}
 
 P + 
   ggthemes::scale_color_fivethirtyeight() +
@@ -99,13 +106,9 @@ P +
 
 ```
 
-```{marginfigure, echo = TRUE}
 Same plot different themes.
-```
 
-```{r trend}
-P
-```
+</aside>
 
 The chart above is generated using R's `ggplot2` library. It's very widely used for creating static graphics in R. See the [official website](https://ggplot2.tidyverse.org/reference/index.html) for a sense of what is possible using this system based on the Grammar of Graphics. [FiveThirtyEight](fivethirtyeight.com) typically uses ggplot and their own custom ggplot theme for static data visualization on their site.
 
@@ -141,25 +144,30 @@ Plot <- left_join(Data,
 
 ungroup(Plot) %>%
   select(place, `eviction-filing rate`, `eviction-filings`, `eviction rate`, evictions) %>%
-  datatable(width = 400) %>%
+  datatable() %>%
   formatPercentage(c("eviction-filing rate", "eviction rate"), digits = 1)
 ```
 
 ## Eviction Filing and Judgment Rates using Plotly
 
-```{marginfigure, echo = TRUE}
-
-$\sqrt{-1}$ $2^{3}$ $\sum\pi$ and it was delicious. LaTeX math is supported.
-
-```
-
 This is a scatter plot of the `r nrow(Plot)` cities in the Eviction Lab data using [Plotly](https://plot.ly/). The eviction filing rate is $\frac{ \text{eviction filings} }{ \text{renter occupied households}}$ while the eviction rate is $\frac{ \text{eviction judgments} }{ \text{renter occupied households}}$.
 
-```{r plotly}
-
-plot_ly(Plot, y = ~`eviction rate`, x = ~`eviction-filing rate`, type = "scatter", mode = "markers",
+```{r plotly, fig.cap = "This is a figure."}
+  plot_ly(Plot, y = ~`eviction rate`, x = ~`eviction-filing rate`, type = "scatter", mode = "markers",
         text = ~paste("Place: ", place))
-
 ```
 
-This is a [prerendered shiny document](https://rmarkdown.rstudio.com/authoring_shiny_prerendered.html).
+<aside>
+
+$\sqrt{-1}$ $2^{3}$  $\sum\pi$ and it was delicious. LaTeX math is supported.
+
+</aside>
+
+### what
+
+Cool. This is a [prerendered shiny document](https://rmarkdown.rstudio.com/authoring_shiny_prerendered.html).
+
+
+
+
+
